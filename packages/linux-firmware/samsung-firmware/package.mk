@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,26 +16,30 @@
 #  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="libXfixes"
-PKG_VERSION="5.0.3"
+PKG_NAME="samsung-firmware"
+PKG_VERSION="20141026.0e5f637"
+PKG_REV="1"
 PKG_ARCH="any"
-PKG_LICENSE="OSS"
-PKG_SITE="http://www.X.org"
-PKG_URL="http://xorg.freedesktop.org/archive/individual/lib/$PKG_NAME-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS_TARGET="toolchain util-macros fixesproto libX11"
-PKG_SECTION="x11/lib"
-PKG_SHORTDESC="libxfixes: X Fixes Library"
-PKG_LONGDESC="X Fixes Library"
+PKG_LICENSE=""
+PKG_SITE="http://git.kernel.org/cgit/linux/kernel/git/firmware/linux-firmware.git"
+PKG_URL="http://people.piment-noir.org/~fraggle/download/odroid/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_DEPENDS_TARGET="toolchain"
+PKG_PRIORITY="optional"
+PKG_SECTION="firmware"
+PKG_SHORTDESC="samsung-firmware: firmwares for various samsung devices"
+PKG_LONGDESC="samsung-firmware: firmwares for various samsung devices"
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-if [ "$OPENGLES" = "opengl-mali" ]; then
-  PKG_CONFIGURE_OPTS_TARGET="--enable-static --enable-shared"
-else
-  PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared"
-fi
+make_target() {
+  : # nothing todo
+}
 
-pre_configure_target() {
-  export CFLAGS="$CFLAGS -fPIC"
+makeinstall_target() {
+  mkdir -p $INSTALL/usr/lib/firmware/s5p-mfc
+    cp -R * $INSTALL/usr/lib/firmware
+    for fw in s5p-* ; do
+      ln -sf ../${fw} $INSTALL/usr/lib/firmware/s5p-mfc/${fw}
+    done
 }

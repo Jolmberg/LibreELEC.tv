@@ -56,6 +56,11 @@ case "$LINUX" in
     PKG_URL="$DISTRO_SRC/$PKG_SOURCE_NAME"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET imx6-status-led imx6-soc-fan irqbalanced"
     ;;
+  mfc-3.8)
+    PKG_COMMIT="ddfddf8"
+    PKG_VERSION="${PKG_COMMIT}"
+    PKG_URL="https://github.com/hardkernel/linux/archive/$PKG_VERSION.tar.gz"
+    ;;
   *)
     PKG_VERSION="4.9.3"
     PKG_URL="http://www.kernel.org/pub/linux/kernel/v4.x/$PKG_NAME-$PKG_VERSION.tar.xz"
@@ -241,6 +246,11 @@ makeinstall_init() {
 }
 
 post_install() {
+  case $PROJECT in
+    Odroid_U2)
+      ln -sfn /storage/.config/smsc95xx_mac_addr $INSTALL/etc/smsc95xx_mac_addr
+    ;;
+  esac
   mkdir -p $INSTALL/usr/lib/firmware/
     ln -sf /storage/.config/firmware/ $INSTALL/usr/lib/firmware/updates
 

@@ -35,6 +35,7 @@ get_graphicdrivers
 
 DRM_CONFIG="--disable-libkms --disable-intel --disable-radeon --disable-amdgpu"
 DRM_CONFIG="$DRM_CONFIG --disable-nouveau --disable-vmwgfx"
+DRM_CONFIG="$DRM_CONFIG --disable-exynos-experimental-api"
 
 for drv in $GRAPHIC_DRIVERS; do
   [ "$drv" = "i915" -o "$drv" = "i965" ] && \
@@ -49,6 +50,10 @@ for drv in $GRAPHIC_DRIVERS; do
   [ "$drv" = "vmware" ] && \
     DRM_CONFIG=`echo $DRM_CONFIG | sed -e 's/disable-libkms/enable-libkms/'` && \
     DRM_CONFIG=`echo $DRM_CONFIG | sed -e 's/disable-vmwgfx/enable-vmwgfx/'`
+
+  [ "$drv" = "armsoc" ] && \
+    DRM_CONFIG=`echo $DRM_CONFIG | sed -e 's/disable-libkms/enable-libkms/'` && \
+    DRM_CONFIG=`echo $DRM_CONFIG | sed -e 's/disable-exynos/enable-exynos/'`
 done
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-udev \

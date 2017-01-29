@@ -37,14 +37,28 @@ mkdir -p $RELEASE_DIR/3rdparty/bootloader
 
   cp -PR $BUILD/linux-*/arch/$TARGET_KERNEL_ARCH/boot/dts/*.dtb $RELEASE_DIR/3rdparty/bootloader 2>/dev/null || :
 
+  mk_u-boot_splash()
+  {
+  if [ -f $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz ]; then
+    cp -PR $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz $RELEASE_DIR/3rdparty/bootloader
+  elif [ -f $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz ]; then
+    cp -PR $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz $RELEASE_DIR/3rdparty/bootloader
+  fi
+  }
+
   case $PROJECT in
     Odroid_C2)
       cp -PR $BUILD/$BOOTLOADER-*/u-boot.bin $RELEASE_DIR/3rdparty/bootloader/u-boot
       cp -PR $PROJECT_DIR/$PROJECT/bootloader/boot.ini $RELEASE_DIR/3rdparty/bootloader
-      if [ -f $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz ]; then
-        cp -PR $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz $RELEASE_DIR/3rdparty/bootloader
-      elif [ -f $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz ]; then
-        cp -PR $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz $RELEASE_DIR/3rdparty/bootloader
-      fi
+      mk_u-boot_splash
+      ;;
+    Odroid_U2)
+      cp -PR $BUILD/$BOOTLOADER-*/u-boot.bin $RELEASE_DIR/3rdparty/bootloader/u-boot
+      for blob in $INSTALL/usr/share/bootloader/* ; do
+        cp -PR $blob $RELEASE_DIR/3rdparty/bootloader 2>/dev/null || :
+      done
+      cp -PR $PROJECT_DIR/$PROJECT/bootloader/boot.ini $RELEASE_DIR/3rdparty/bootloader
+      cp -PR $PROJECT_DIR/$PROJECT/bootloader/u-boot-fuse $RELEASE_DIR/3rdparty/bootloader
+      mk_u-boot_splash
       ;;
   esac

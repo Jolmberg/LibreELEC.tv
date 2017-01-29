@@ -1,0 +1,24 @@
+---
+ src/armsoc_driver.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/src/armsoc_driver.c
++++ b/src/armsoc_driver.c
+@@ -1334,7 +1334,7 @@ ARMSOCEnterVT(VT_FUNC_ARGS_DECL)
+ 	TRACE_ENTER();
+ 
+ 	for (i = 1; i < currentMaxClients; i++) {
+-		if (clients[i])
++		if (clients[i] && !clients[i]->clientGone)
+ 			AttendClient(clients[i]);
+ 	}
+ 
+@@ -1369,7 +1369,7 @@ ARMSOCLeaveVT(VT_FUNC_ARGS_DECL)
+ 	TRACE_ENTER();
+ 
+ 	for (i = 1; i < currentMaxClients; i++) {
+-		if (clients[i])
++		if (clients[i] && !clients[i]->clientGone)
+ 			IgnoreClient(clients[i]);
+ 	}
+ 

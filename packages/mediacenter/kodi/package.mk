@@ -198,6 +198,9 @@ if [ ! "$KODIPLAYER_DRIVER" = default ]; then
     CXXFLAGS="$CXXFLAGS -DHAS_IMXVPU -DLINUX -DEGL_API_FB"
   elif [ "$KODIPLAYER_DRIVER" = libamcodec ]; then
     KODI_PLAYER="-DENABLE_AML=ON"
+  elif [ "$KODIPLAYER_DRIVER" = odroid-mfc ]; then
+    PKG_DEPENDS_TARGET="${PKG_DEPENDS_TARGET/ $KODIPLAYER_DRIVER/}"
+    KODI_PLAYER="-DENABLE_MFC=ON"
   fi
 fi
 

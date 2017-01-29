@@ -17,12 +17,14 @@
 ################################################################################
 
 PKG_NAME="opengl-mali"
-PKG_VERSION="20130520"
+PKG_VERSION="4412_r5p0_x11"
+PKG_DEPENDS_TARGET="toolchain"
+PKG_URL="http://people.piment-noir.org/~fraggle/download/odroid/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libXfixes libXrender libXcomposite libxcb"
+PKG_SOURCE_DIR="${PKG_NAME}-${PKG_VERSION}"
 PKG_ARCH="arm"
 PKG_LICENSE="nonfree"
-PKG_SITE="http://www.arm.com/products/multimedia/mali-graphics-hardware/mali-400-mp.php"
-PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_SITE="http://www.arm.com/products/multimedia/mali-gpu/ultra-low-power/mali-400.php"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="opengl-mali: OpenGL-ES and Mali driver for Mali 400 GPUs"
 PKG_LONGDESC="opengl-mali: OpenGL-ES and Mali driver for Mali 400 GPUs"
@@ -38,16 +40,40 @@ makeinstall_target() {
   mkdir -p $SYSROOT_PREFIX/usr/include
     cp -PR src/include/* $SYSROOT_PREFIX/usr/include
 
+  # EGL pkgconfig definition is needed since Kodi Krypton
+  mkdir -p $SYSROOT_PREFIX/usr/lib/pkgconfig
+    cat > $SYSROOT_PREFIX/usr/lib/pkgconfig/egl.pc <<\ \ \ \ EoF
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib/
+includedir=${prefix}/include
+
+Name: EGL
+Description: EGL
+Version: @PKG_VERSION@
+Requires:
+Libs: -L${libdir} -lEGL
+Cflags: -I${includedir}/EGL
+    EoF
+    sed -i "s/@PKG_VERSION@/$PKG_VERSION/" $SYSROOT_PREFIX/usr/lib/pkgconfig/egl.pc
+
+  # cleanup packaged unused links
+  rm -f libEGL.so.1
+  rm -f libEGL.so.1.4
+  rm -f libGLESv1_CM.so
+  rm -f libGLESv1_CM.so.1
+  rm -f libGLESv1_CM.so.1.1
+  rm -f libGLESv2.so.2
+  rm -f libGLESv2.so.2.0
+
   mkdir -p $SYSROOT_PREFIX/usr/lib
-    cp -PR src/lib/*.so* $SYSROOT_PREFIX/usr/lib
-    ln -sf libEGL.so.1.4 $SYSROOT_PREFIX/usr/lib/libEGL.so
-    ln -sf libGLESv1_CM.so.1.1 $SYSROOT_PREFIX/usr/lib/libGLESv1_CM.so
-    ln -sf libGLESv2.so.2.0 $SYSROOT_PREFIX/usr/lib/libGLESv2.so
+    cp -PR *.so* $SYSROOT_PREFIX/usr/lib
+    ln -sf libMali.so $SYSROOT_PREFIX/usr/lib/libEGL.so
+    ln -sf libMali.so $SYSROOT_PREFIX/usr/lib/libGLESv2.so
 
   mkdir -p $INSTALL/usr/lib
-    cp -PR src/lib/*.so* $INSTALL/usr/lib
-    ln -sf libEGL.so.1.4 $INSTALL/usr/lib/libEGL.so
-    ln -sf libGLESv1_CM.so.1.1 $INSTALL/usr/lib/libGLESv1_CM.so
-    ln -sf libGLESv2.so.2.0 $INSTALL/usr/lib/libGLESv2.so
+    cp -PR *.so* $INSTALL/usr/lib
+    ln -sf libMali.so $INSTALL/usr/lib/libEGL.so
+    ln -sf libMali.so $INSTALL/usr/lib/libGLESv2.so
 }
 

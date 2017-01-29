@@ -1,0 +1,23 @@
+---
+ include/configs/odroid.h |    3 +++
+ 1 file changed, 3 insertions(+)
+
+--- a/include/configs/odroid.h
++++ b/include/configs/odroid.h
+@@ -126,6 +126,7 @@
+ 	"kernel_args=" \
+ 		"setenv bootargs root=/dev/mmcblk${mmcrootdev}p${mmcrootpart}" \
+ 		" rootwait ${console} ${opts}\0" \
++	"boot_ini=bootini\0" \
+ 	"boot_script=" \
+ 		"run loadbootscript;" \
+ 		"source ${scriptaddr}\0" \
+@@ -154,6 +155,8 @@
+ 	"autoboot=" \
+ 		"if test -e mmc 0 boot.scr; then; " \
+ 			"run boot_script; " \
++		"elif test -e mmc 0 boot.ini; then; " \
++			"run boot_ini;" \
+ 		"elif test -e mmc 0 Image.itb; then; " \
+ 			"run boot_fit;" \
+ 		"elif test -e mmc 0 zImage; then; " \

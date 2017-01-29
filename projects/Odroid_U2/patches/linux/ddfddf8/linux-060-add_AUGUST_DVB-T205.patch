@@ -1,0 +1,15 @@
+diff --git a/drivers/media/usb/dvb-usb-v2/rtl28xxu.c b/drivers/media/usb/dvb-usb-v2/rtl28xxu.c
+index 2cc8ec7..985fa11 100644
+--- a/drivers/media/usb/dvb-usb-v2/rtl28xxu.c
++++ b/drivers/media/usb/dvb-usb-v2/rtl28xxu.c
+@@ -1352,6 +1352,9 @@
+ 		&rtl2832u_props, "Dexatek DK mini DVB-T Dongle", NULL) },
+ 	{ DVB_USB_DEVICE(USB_VID_TERRATEC, 0x00d7,
+ 		&rtl2832u_props, "TerraTec Cinergy T Stick+", NULL) },
++	{ DVB_USB_DEVICE(USB_VID_GTEK, 0xa803,
++		&rtl2832u_props, "Realtek RTL2832U reference design", NULL) },
++
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(usb, rtl28xxu_id_table);
+

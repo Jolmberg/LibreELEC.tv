@@ -1,0 +1,67 @@
+---
+ src/armsoc_exa.c      |    3 +--
+ src/armsoc_exa_null.c |    2 +-
+ src/drmmode_display.c |    8 ++++----
+ 3 files changed, 6 insertions(+), 7 deletions(-)
+
+--- a/src/armsoc_exa.c
++++ b/src/armsoc_exa.c
+@@ -164,8 +164,7 @@ ARMSOCCreatePixmap2(ScreenPtr pScreen, i
+ 		int depth, int usage_hint, int bitsPerPixel,
+ 		int *new_fb_pitch)
+ {
+-	struct ARMSOCPixmapPrivRec *priv =
+-				calloc(sizeof(struct ARMSOCPixmapPrivRec), 1);
++	struct ARMSOCPixmapPrivRec *priv = calloc(1, sizeof(struct ARMSOCPixmapPrivRec));
+ 	ScrnInfoPtr pScrn = xf86ScreenToScrn(pScreen);
+ 	struct ARMSOCRec *pARMSOC = ARMSOCPTR(pScrn);
+ 
+--- a/src/armsoc_exa_null.c
++++ b/src/armsoc_exa_null.c
+@@ -109,7 +109,7 @@ Bool InstallAlphaHack(ScreenPtr pScreen)
+ struct ARMSOCEXARec *
+ InitNullEXA(ScreenPtr pScreen, ScrnInfoPtr pScrn, int fd)
+ {
+-	struct ARMSOCNullEXARec *null_exa = calloc(sizeof(*null_exa), 1);
++	struct ARMSOCNullEXARec *null_exa = calloc(1, sizeof(*null_exa));
+ 	struct ARMSOCEXARec *armsoc_exa;
+ 	ExaDriverPtr exa;
+ 
+--- a/src/drmmode_display.c
++++ b/src/drmmode_display.c
+@@ -341,7 +341,7 @@ drmmode_set_mode_major(xf86CrtcPtr crtc,
+ 	crtc->y = y;
+ 	crtc->rotation = rotation;
+ 
+-	output_ids = calloc(sizeof(uint32_t), xf86_config->num_output);
++	output_ids = calloc(xf86_config->num_output, sizeof(uint32_t));
+ 	if (!output_ids) {
+ 		ERROR_MSG(
+ 				"memory allocation failed in drmmode_set_mode_major()");
+@@ -991,7 +991,7 @@ drmmode_crtc_init(ScrnInfoPtr pScrn, str
+ 	if (crtc == NULL)
+ 		return;
+ 
+-	drmmode_crtc = xnfcalloc(sizeof(struct drmmode_crtc_private_rec), 1);
++	drmmode_crtc = xnfcalloc(1, sizeof(struct drmmode_crtc_private_rec));
+ 	drmmode_crtc->crtc_id = drmmode->mode_res->crtcs[num];
+ 	drmmode_crtc->drmmode = drmmode;
+ 	drmmode_crtc->last_good_mode = NULL;
+@@ -1510,7 +1510,7 @@ drmmode_output_init(ScrnInfoPtr pScrn, s
+ 	if (!connector)
+ 		goto exit;
+ 
+-	encoders = calloc(sizeof(drmModeEncoderPtr), connector->count_encoders);
++	encoders = calloc(connector->count_encoders, sizeof(drmModeEncoderPtr));
+ 	if (!encoders)
+ 		goto free_connector_exit;
+ 
+@@ -1529,7 +1529,7 @@ drmmode_output_init(ScrnInfoPtr pScrn, s
+ 	if (!output)
+ 		goto free_encoders_exit;
+ 
+-	drmmode_output = calloc(sizeof(struct drmmode_output_priv), 1);
++	drmmode_output = calloc(1, sizeof(struct drmmode_output_priv));
+ 	if (!drmmode_output) {
+ 		xf86OutputDestroy(output);
+ 		goto free_encoders_exit;

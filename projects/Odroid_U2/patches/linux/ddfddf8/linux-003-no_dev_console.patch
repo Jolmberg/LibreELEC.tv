@@ -1,0 +1,19 @@
+--- linux-odroid-3.8.13.21/init/main.c.orig	2014-05-09 12:07:09.436583808 -0400
++++ linux-odroid-3.8.13.21/init/main.c	2014-05-09 12:24:13.830397853 -0400
+@@ -899,9 +899,14 @@
+ 	do_basic_setup();
+ 
+ 	/* Open the /dev/console on the rootfs, this should never fail */
+-	if (sys_open((const char __user *) "/dev/console", O_RDWR, 0) < 0)
+-		printk(KERN_WARNING "Warning: unable to open an initial console.\n");
++	char *console = "/dev/console";
+ 
++	if (sys_open((const char __user *) "/dev/console", O_RDWR, 0) < 0) {
++		sys_mknod(console, S_IFCHR|0600, (TTYAUX_MAJOR<<8)|1);
++		if (sys_open(console, O_RDWR, 0) < 0)
++			printk(KERN_WARNING "Warning: unable to open an initial console.\n");
++		sys_unlink(console);
++	}
+ 	(void) sys_dup(0);
+ 	(void) sys_dup(0);
+ 	/*

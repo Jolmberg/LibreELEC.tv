@@ -18,20 +18,32 @@
 
 PKG_NAME="u-boot"
 PKG_DEPENDS_TARGET="toolchain"
-if [ "$UBOOT_VERSION" = "imx6-cuboxi" ]; then
-  PKG_VERSION="imx6-408544d"
-  PKG_SITE="http://imx.solid-run.com/wiki/index.php?title=Building_the_kernel_and_u-boot_for_the_CuBox-i_and_the_HummingBoard"
-  # https://github.com/SolidRun/u-boot-imx6.git
-  PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
-  [ -n "$UBOOT_CONFIG_V2" ] && PKG_DEPENDS_TARGET="toolchain u-boot-v2"
-elif [ "$UBOOT_VERSION" = "hardkernel" ]; then
-  PKG_VERSION="6e4e886"
-  PKG_SITE="https://github.com/hardkernel/u-boot"
-  PKG_URL="https://github.com/hardkernel/u-boot/archive/$PKG_VERSION.tar.gz"
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:host"
-else
-  exit 0
-fi
+case "$UBOOT_VERSION" in
+  "imx6-cuboxi")
+    PKG_VERSION="imx6-408544d"
+    PKG_SITE="http://imx.solid-run.com/wiki/index.php?title=Building_the_kernel_and_u-boot_for_the_CuBox-i_and_the_HummingBoard"
+    # https://github.com/SolidRun/u-boot-imx6.git
+    PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
+    [ -n "$UBOOT_CONFIG_V2" ] && PKG_DEPENDS_TARGET="toolchain u-boot-v2"
+    ;;
+  "hardkernel")
+    PKG_VERSION="6e4e886"
+    PKG_SITE="https://github.com/hardkernel/u-boot"
+    PKG_URL="https://github.com/hardkernel/u-boot/archive/$PKG_VERSION.tar.gz"
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:host"
+    ;;
+  "mainline"|*)
+    PKG_VERSION="2016.11"
+    PKG_SITE="http://www.denx.de/wiki/U-Boot/WebHome"
+    PKG_URL="ftp://ftp.denx.de/pub/u-boot/u-boot-$PKG_VERSION.tar.bz2"
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET dtc:host"
+    ;;
+esac
+case "$PROJECT" in
+  "Odroid_U2")
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET odroid-u2-bootloader"
+    ;;
+esac
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SECTION="tools"
@@ -57,8 +69,9 @@ pre_configure_target() {
   MAKEFLAGS=-j1
 
 # copy compiler-gcc5.h to compiler-gcc6. for fake building
-  cp include/linux/compiler-gcc5.h include/linux/compiler-gcc6.h
-
+  if [ "$UBOOT_VERSION" != "mainline" ]; then
+    cp include/linux/compiler-gcc5.h include/linux/compiler-gcc6.h
+  fi
 }
 
 make_target() {
@@ -129,15 +142,34 @@ makeinstall_target() {
 
   cp -PR $PROJECT_DIR/$PROJECT/bootloader/uEnv*.txt $INSTALL/usr/share/bootloader 2>/dev/null || :
 
+  mk_u-boot_splash()
+  {
+  if [ -f $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz ]; then
+    cp -PRv $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz $INSTALL/usr/share/bootloader
+  elif [ -f $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz ]; then
+    cp -PRv $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz $INSTALL/usr/share/bootloader
+  fi
+  }
+
   case $PROJECT in
     Odroid_C2)
       cp -PRv $PKG_DIR/scripts/update-c2.sh $INSTALL/usr/share/bootloader/update.sh
       cp -PRv $ROOT/$PKG_BUILD/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
-      if [ -f $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz ]; then
-        cp -PRv $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz $INSTALL/usr/share/bootloader
-      elif [ -f $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz ]; then
-        cp -PRv $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz $INSTALL/usr/share/bootloader
+      mk_u-boot_splash
+      ;;
+    Odroid_U2)
+      # FIXME: this code path is more specific to mainline u-boot version than a project
+      if [ -f "$ROOT/$PKG_BUILD/u-boot-dtb.bin" ]; then
+        cp -PRv $ROOT/$PKG_BUILD/u-boot-dtb.bin $INSTALL/usr/share/bootloader/u-boot
+      elif [ -f "$ROOT/$PKG_BUILD/u-boot.bin" ]; then
+        cp -PRv $ROOT/$PKG_BUILD/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
+      elif [ -f "$ROOT/$PKG_BUILD/sd_fuse/u-boot.bin" ]; then
+        cp -PRv $ROOT/$PKG_BUILD/sd_fuse/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
+      elif [ -f "$ROOT/$PKG_BUILD/build/u-boot.bin" ]; then
+        cp -PRv $ROOT/$PKG_BUILD/build/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
       fi
+      cp -PRv $PKG_DIR/scripts/update-u2.sh $INSTALL/usr/share/bootloader/update.sh
+      mk_u-boot_splash
       ;;
     imx6)
       cp -PRv $PKG_DIR/scripts/update.sh $INSTALL/usr/share/bootloader

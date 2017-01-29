@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,26 +16,26 @@
 #  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="libXfixes"
-PKG_VERSION="5.0.3"
-PKG_ARCH="any"
+PKG_NAME="xf86-video-armsoc"
+PKG_VERSION="3.1.0-rc1"
+PKG_REV="1"
+PKG_ARCH="arm"
 PKG_LICENSE="OSS"
-PKG_SITE="http://www.X.org"
-PKG_URL="http://xorg.freedesktop.org/archive/individual/lib/$PKG_NAME-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS_TARGET="toolchain util-macros fixesproto libX11"
-PKG_SECTION="x11/lib"
-PKG_SHORTDESC="libxfixes: X Fixes Library"
-PKG_LONGDESC="X Fixes Library"
+PKG_SITE="https://github.com/endlessm/xf86-video-armsoc"
+PKG_URL="https://github.com/endlessm/xf86-video-armsoc/archive/Release_${PKG_VERSION}.tar.gz"
+PKG_DEPENDS_TARGET="toolchain util-macros xorg-server"
+PKG_NEED_UNPACK="$LINUX_DEPENDS"
+PKG_SECTION="x11/driver"
+PKG_SHORTDESC="xf86-video-armsoc: The Xorg driver for some ARM video chips"
+PKG_LONGDESC="The Xorg driver for some ARM video chips"
+PKG_SOURCE_DIR="${PKG_NAME}-Release_${PKG_VERSION}"
 
 PKG_IS_ADDON="no"
-PKG_AUTORECONF="no"
+PKG_AUTORECONF="yes"
 
-if [ "$OPENGLES" = "opengl-mali" ]; then
-  PKG_CONFIGURE_OPTS_TARGET="--enable-static --enable-shared"
-else
-  PKG_CONFIGURE_OPTS_TARGET="--enable-static --disable-shared"
-fi
+PKG_CONFIGURE_OPTS_TARGET="--with-xorg-module-dir=$XORG_PATH_MODULES --with-drmmode=exynos"
 
-pre_configure_target() {
-  export CFLAGS="$CFLAGS -fPIC"
+post_makeinstall_target() {
+  mkdir -p $INSTALL/etc/X11/xorg.conf.d
+    cp $PKG_DIR/config/*.conf $INSTALL/etc/X11/xorg.conf.d/20-armsoc.conf
 }

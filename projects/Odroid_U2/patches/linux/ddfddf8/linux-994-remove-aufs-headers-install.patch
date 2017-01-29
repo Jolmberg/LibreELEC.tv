@@ -1,0 +1,12 @@
+diff --git a/ubuntu/include/linux/Kbuild b/ubuntu/include/linux/Kbuild
+index 50d9e8c..e69de29 100644
+--- a/ubuntu/include/linux/Kbuild
++++ b/ubuntu/include/linux/Kbuild
+@@ -1 +0,0 @@
+-header-y += aufs_type.h
+diff --git a/ubuntu/include/uapi/linux/Kbuild b/ubuntu/include/uapi/linux/Kbuild
+index e1b2bd3..e69de29 100644
+--- a/ubuntu/include/uapi/linux/Kbuild
++++ b/ubuntu/include/uapi/linux/Kbuild
+@@ -1 +0,0 @@
+-header-y = aufs_type.h
