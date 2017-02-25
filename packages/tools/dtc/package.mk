@@ -37,6 +37,5 @@ makeinstall_target() {
 }
 
 makeinstall_host() {
-  mkdir -p $INSTALL/usr/bin
-    cp -P $ROOT/$PKG_BUILD/dtc $INSTALL/usr/bin
+  make install PREFIX=$ROOT/$TOOLCHAIN
 }
