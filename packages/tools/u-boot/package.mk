@@ -20,11 +20,13 @@ PKG_NAME="u-boot"
 PKG_DEPENDS_TARGET="toolchain"
 case "$UBOOT_VERSION" in
   "imx6-cuboxi")
-    PKG_VERSION="imx6-408544d"
-    PKG_SITE="http://imx.solid-run.com/wiki/index.php?title=Building_the_kernel_and_u-boot_for_the_CuBox-i_and_the_HummingBoard"
-    # https://github.com/SolidRun/u-boot-imx6.git
-    PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
-    [ -n "$UBOOT_CONFIG_V2" ] && PKG_DEPENDS_TARGET="toolchain u-boot-v2"
+    PKG_COMMIT="c8d1200"
+    PKG_VERSION="imx6-$PKG_COMMIT"
+    PKG_SITE="http://solid-run.com/wiki/doku.php?id=products:imx6:software:development:u-boot"
+    PKG_URL="https://github.com/SolidRun/u-boot-imx6/archive/$PKG_COMMIT.tar.gz"
+    PKG_SOURCE_NAME="$PKG_NAME-sr-$PKG_VERSION.tar.gz"
+    PKG_SOURCE_DIR="$PKG_NAME-imx6-${PKG_COMMIT}*"
+  [ -n "$UBOOT_CONFIG_V2" ] && PKG_DEPENDS_TARGET="toolchain u-boot-v2"
     ;;
   "hardkernel")
     PKG_VERSION="6e4e886"
