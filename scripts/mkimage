@@ -97,7 +97,7 @@ trap cleanup SIGINT
 if [ "$BOOTLOADER" = "syslinux" ]; then
   # write mbr
     echo "image: writing mbr..."
-    MBR="$ROOT/$TOOLCHAIN/share/syslinux/gptmbr.bin"
+    MBR="$TOOLCHAIN/share/syslinux/gptmbr.bin"
     if [ -n "$MBR" ]; then
       dd bs=440 count=1 conv=fsync,notrunc if="$MBR" of="$DISK" >"$SAVE_ERROR" 2>&1 || show_error
     fi
@@ -144,18 +144,6 @@ LABEL run
   APPEND boot=UUID=$UUID_SYSTEM disk=UUID=$UUID_STORAGE portable quiet
 EOF
 
-  if [ "$PROJECT" = Virtual ]; then
-    cat << EOF > "$LE_TMP"/syslinux.cfg
-DEFAULT virtual
-TIMEOUT 50
-PROMPT 0
-
-LABEL virtual
-  KERNEL /$KERNEL_NAME
-  APPEND boot=UUID=$UUID_SYSTEM disk=UUID=$UUID_STORAGE quiet tty vga=current
-EOF
-  fi
-
     mcopy "$LE_TMP/syslinux.cfg" ::
 
   # install extlinux
@@ -170,8 +158,8 @@ EOF
     mcopy $RELEASE_DIR/target/SYSTEM.md5 ::/SYSTEM.md5
 
     mmd EFI EFI/BOOT
-    mcopy $ROOT/$TOOLCHAIN/share/syslinux/bootx64.efi ::/EFI/BOOT
-    mcopy $ROOT/$TOOLCHAIN/share/syslinux/ldlinux.e64 ::/EFI/BOOT
+    mcopy $TOOLCHAIN/share/syslinux/bootx64.efi ::/EFI/BOOT
+    mcopy $TOOLCHAIN/share/syslinux/ldlinux.e64 ::/EFI/BOOT
     mcopy "$LE_TMP"/syslinux.cfg ::/EFI/BOOT
 elif [ "$BOOTLOADER" = "bcm2835-bootloader" ]; then
   # create bootloader configuration
@@ -302,7 +290,7 @@ fi # bootloader
   fsck -n $LE_TMP/part1.fat >"$SAVE_ERROR" 2>&1 || show_error
 
 # create virtual images
-  if [ "$PROJECT" = Virtual ]; then
+  if [ "$PROJECT" = "Generic" ]; then
     echo "image: creating open virtual appliance..."
     qemu-img convert -O vmdk -o subformat=streamOptimized "$DISK" "$DISK.vmdk"
     sed -e "s,@DISTRO@,$DISTRO,g" -e "s,@DISK@,$(basename $DISK),g" -e "s,@DISK_SIZE@,$(ls -l $DISK.vmdk | awk '{print $5}'),g" $PROJECT_DIR/$PROJECT/config/ovf.template > $DISK.ovf

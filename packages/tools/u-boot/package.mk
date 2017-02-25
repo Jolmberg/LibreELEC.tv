@@ -20,10 +20,12 @@ PKG_NAME="u-boot"
 PKG_DEPENDS_TARGET="toolchain"
 case "$UBOOT_VERSION" in
   "imx6-cuboxi")
-    PKG_VERSION="imx6-408544d"
-    PKG_SITE="http://imx.solid-run.com/wiki/index.php?title=Building_the_kernel_and_u-boot_for_the_CuBox-i_and_the_HummingBoard"
-    # https://github.com/SolidRun/u-boot-imx6.git
-    PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
+    PKG_COMMIT="c8d1200"
+    PKG_VERSION="imx6-$PKG_COMMIT"
+    PKG_SITE="http://solid-run.com/wiki/doku.php?id=products:imx6:software:development:u-boot"
+    PKG_URL="https://github.com/SolidRun/u-boot-imx6/archive/$PKG_COMMIT.tar.gz"
+    PKG_SOURCE_NAME="$PKG_NAME-sr-$PKG_VERSION.tar.gz"
+    PKG_SOURCE_DIR="$PKG_NAME-imx6-${PKG_COMMIT}*"
     [ -n "$UBOOT_CONFIG_V2" ] && PKG_DEPENDS_TARGET="toolchain u-boot-v2"
     ;;
   "hardkernel")
@@ -83,7 +85,7 @@ make_target() {
 
   for UBOOT_TARGET in $UBOOT_CONFIG; do
     if [ "$PROJECT" = "Odroid_C2" ]; then
-      export PATH=$ROOT/$TOOLCHAIN/lib/gcc-linaro-aarch64-elf/bin/:$ROOT/$TOOLCHAIN/lib/gcc-linaro-arm-eabi/bin/:$PATH
+      export PATH=$TOOLCHAIN/lib/gcc-linaro-aarch64-elf/bin/:$TOOLCHAIN/lib/gcc-linaro-arm-eabi/bin/:$PATH
       CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make mrproper
       CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make $UBOOT_TARGET
       CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make HOSTCC="$HOST_CC" HOSTSTRIP="true"
@@ -113,11 +115,11 @@ make_target() {
 }
 
 makeinstall_target() {
-  mkdir -p $ROOT/$TOOLCHAIN/bin
+  mkdir -p $TOOLCHAIN/bin
     if [ -f build/tools/mkimage ]; then
-      cp build/tools/mkimage $ROOT/$TOOLCHAIN/bin
+      cp build/tools/mkimage $TOOLCHAIN/bin
     else
-      cp tools/mkimage $ROOT/$TOOLCHAIN/bin
+      cp tools/mkimage $TOOLCHAIN/bin
     fi
 
   BOOT_CFG="$PROJECT_DIR/$PROJECT/bootloader/boot.cfg"
@@ -134,11 +136,11 @@ makeinstall_target() {
 
   mkdir -p $INSTALL/usr/share/bootloader
 
-  cp $ROOT/$PKG_BUILD/u-boot*.imx $INSTALL/usr/share/bootloader 2>/dev/null || :
-  cp $ROOT/$PKG_BUILD/u-boot*.img $INSTALL/usr/share/bootloader 2>/dev/null || :
-  cp $ROOT/$PKG_BUILD/SPL* $INSTALL/usr/share/bootloader 2>/dev/null || :
+  cp $PKG_BUILD/u-boot*.imx $INSTALL/usr/share/bootloader 2>/dev/null || :
+  cp $PKG_BUILD/u-boot*.img $INSTALL/usr/share/bootloader 2>/dev/null || :
+  cp $PKG_BUILD/SPL* $INSTALL/usr/share/bootloader 2>/dev/null || :
 
-  cp $ROOT/$PKG_BUILD/$UBOOT_CONFIGFILE $INSTALL/usr/share/bootloader 2>/dev/null || :
+  cp $PKG_BUILD/$UBOOT_CONFIGFILE $INSTALL/usr/share/bootloader 2>/dev/null || :
 
   cp -PR $PROJECT_DIR/$PROJECT/bootloader/uEnv*.txt $INSTALL/usr/share/bootloader 2>/dev/null || :
 
@@ -154,19 +156,19 @@ makeinstall_target() {
   case $PROJECT in
     Odroid_C2)
       cp -PRv $PKG_DIR/scripts/update-c2.sh $INSTALL/usr/share/bootloader/update.sh
-      cp -PRv $ROOT/$PKG_BUILD/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
+      cp -PRv $PKG_BUILD/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
       mk_u-boot_splash
       ;;
     Odroid_U2)
       # FIXME: this code path is more specific to mainline u-boot version than a project
-      if [ -f "$ROOT/$PKG_BUILD/u-boot-dtb.bin" ]; then
-        cp -PRv $ROOT/$PKG_BUILD/u-boot-dtb.bin $INSTALL/usr/share/bootloader/u-boot
-      elif [ -f "$ROOT/$PKG_BUILD/u-boot.bin" ]; then
-        cp -PRv $ROOT/$PKG_BUILD/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
-      elif [ -f "$ROOT/$PKG_BUILD/sd_fuse/u-boot.bin" ]; then
-        cp -PRv $ROOT/$PKG_BUILD/sd_fuse/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
-      elif [ -f "$ROOT/$PKG_BUILD/build/u-boot.bin" ]; then
-        cp -PRv $ROOT/$PKG_BUILD/build/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
+      if [ -f "$PKG_BUILD/u-boot-dtb.bin" ]; then
+        cp -PRv $PKG_BUILD/u-boot-dtb.bin $INSTALL/usr/share/bootloader/u-boot
+      elif [ -f "$PKG_BUILD/u-boot.bin" ]; then
+        cp -PRv $PKG_BUILD/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
+      elif [ -f "$PKG_BUILD/sd_fuse/u-boot.bin" ]; then
+        cp -PRv $PKG_BUILD/sd_fuse/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
+      elif [ -f "$PKG_BUILD/build/u-boot.bin" ]; then
+        cp -PRv $PKG_BUILD/build/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
       fi
       cp -PRv $PKG_DIR/scripts/update-u2.sh $INSTALL/usr/share/bootloader/update.sh
       mk_u-boot_splash

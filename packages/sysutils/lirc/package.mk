@@ -21,7 +21,7 @@ PKG_VERSION="0.9.4c"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.lirc.org"
-PKG_URL="$SOURCEFORGE_SRC/lirc/$PKG_NAME-$PKG_VERSION.tar.bz2"
+PKG_URL="https://sourceforge.net/projects/lirc/files/LIRC/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.bz2"
 PKG_DEPENDS_TARGET="toolchain libftdi1 libusb-compat libxslt"
 PKG_SECTION="sysutils/remote"
 PKG_SHORTDESC="lirc: Linux Infrared Remote Control"
@@ -36,6 +36,12 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_forkpty=no \
                            --localstatedir=/ \
                            --with-gnu-ld \
                            --without-x"
+
+pre_configure_target() {
+  # patch lirc-make-devinput to use target kernel include
+  sed -e "s|/usr/include/linux/|${SYSROOT_PREFIX}/usr/include/linux/|g" \
+      -i $PKG_BUILD/tools/lirc-make-devinput
+}
 
 post_makeinstall_target() {
   rm -rf $INSTALL/usr/lib/systemd
