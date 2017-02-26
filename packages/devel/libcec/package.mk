@@ -83,3 +83,15 @@ post_makeinstall_target() {
     mv $INSTALL/usr/lib/python2.7/dist-packages $INSTALL/usr/lib/python2.7/site-packages
   fi
 }
+
+post_install() {
+  case $PROJECT in
+    Odroid_U2)
+      cat > /storage/.config/cec-hdmi-port.conf < EoF
+# Default:
+# CEC_HDMI_PORT=1
+EoF
+      ln -sfn /storage/.config/cec-hdmi-port.conf $INSTALL/etc/profile.d/20-cec-hdmi-port.conf
+    ;;
+  esac
+}
