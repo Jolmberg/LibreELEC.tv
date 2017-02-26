@@ -87,7 +87,7 @@ post_makeinstall_target() {
 post_install() {
   case $PROJECT in
     Odroid_U2)
-      cat > /storage/.config/cec-hdmi-port.conf < EoF
+      cat > $INSTALL/etc/profile.d/20-cec-hdmi-port.conf << EoF
 # Default:
 # CEC_HDMI_PORT=1
 EoF
