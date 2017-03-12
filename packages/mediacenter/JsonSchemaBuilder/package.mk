@@ -22,7 +22,7 @@ PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
 PKG_URL=""
-PKG_NEED_UNPACK="$ROOT/packages/mediacenter/$MEDIACENTER/package.mk"
+PKG_NEED_UNPACK="$(get_pkg_directory $MEDIACENTER)"
 PKG_SECTION="mediacenter"
 PKG_SHORTDESC="kodi-platform:"
 PKG_LONGDESC="kodi-platform:"
@@ -33,10 +33,6 @@ PKG_AUTORECONF="no"
 PKG_CMAKE_SCRIPT="$(get_build_dir $MEDIACENTER)/tools/depends/native/JsonSchemaBuilder/CMakeLists.txt"
 
 PKG_CMAKE_OPTS_HOST="-Wno-dev"
-
-pre_build_host() {
-  $SCRIPTS/clean $PKG_NAME
-}
 
 makeinstall_host() {
   mkdir -p $TOOLCHAIN/bin
