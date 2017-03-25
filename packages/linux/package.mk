@@ -64,7 +64,7 @@ case "$LINUX" in
     PKG_URL="https://github.com/hardkernel/linux/archive/$PKG_VERSION.tar.gz"
     ;;
   *)
-    PKG_VERSION="4.10"
+    PKG_VERSION="4.10.4"
     PKG_URL="http://www.kernel.org/pub/linux/kernel/v4.x/$PKG_NAME-$PKG_VERSION.tar.xz"
     PKG_PATCH_DIRS="default"
     ;;
@@ -144,6 +144,10 @@ post_patch() {
       sed -i -e "s|CONFIG_MXC_HDMI_CEC_SR=y||" $PKG_BUILD/.config
     fi
   fi
+
+  # install extra dts files
+  cp -v projects/$PROJECT/devices/$DEVICE/config/*-overlay.dts $PKG_BUILD/arch/$TARGET_KERNEL_ARCH/boot/dts/overlays/ || :
+  cp -v projects/$PROJECT/devices/$DEVICE/config/dt-blob.dts $PKG_BUILD/arch/$TARGET_KERNEL_ARCH/boot/dts/ || :
 }
 
 makeinstall_host() {
