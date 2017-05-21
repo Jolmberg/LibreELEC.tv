@@ -1,14 +1,16 @@
+MFC support for ODROID type hardware.
+
 ---
  configure.ac                                                |   41 	40 +	1 -	0 !
  m4/xbmc_arch.m4                                             |    2 	1 +	1 -	0 !
- project/cmake/CMakeLists.txt                                |    1 	1 +	0 -	0 !
+ project/cmake/modules/FindX.cmake                           |   13 	11 +	2 -	0 !
  project/cmake/scripts/common/ArchSetup.cmake                |    8 	8 +	0 -	0 !
  xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp                 |   39 	26 +	13 -	0 !
  xbmc/cores/VideoPlayer/DVDCodecs/DVDFactoryCodec.cpp        |    5 	5 +	0 -	0 !
  xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp         |   29 	24 +	5 -	0 !
  xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt       |    5 	5 +	0 -	0 !
- xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecMFC.cpp |  579 	579 +	0 -	0 !
- xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecMFC.h   |   63 	63 +	0 -	0 !
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecMFC.cpp |  603 	603 +	0 -	0 !
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecMFC.h   |   67 	67 +	0 -	0 !
  xbmc/cores/VideoPlayer/DVDCodecs/Video/Makefile.in          |    5 	4 +	1 -	0 !
  xbmc/linux/CMakeLists.txt                                   |    2 	2 +	0 -	0 !
  xbmc/linux/LinuxV4l2Sink.cpp                                |  311 	311 +	0 -	0 !
@@ -17,6 +19,7 @@
  xbmc/system_gl.h                                            |    4 	4 +	0 -	0 !
  xbmc/utils/AMLUtils.cpp                                     |   93 	87 +	6 -	0 !
  xbmc/utils/CPUInfo.cpp                                      |   25 	13 +	12 -	0 !
+ xbmc/windowing/X11/GLContextEGL.cpp                         |    4 	4 +	0 -	0 !
  xbmc/windowing/X11/WinSystemX11.cpp                         |    2 	1 +	1 -	0 !
  xbmc/windowing/egl/CMakeLists.txt                           |    6 	4 +	2 -	0 !
  xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp                 |   93 	67 +	26 -	0 !
@@ -27,7 +30,7 @@
  xbmc/windowing/egl/EGLNativeTypeHybris.h                    |   77 	77 +	0 -	0 !
  xbmc/windowing/egl/EGLWrapper.cpp                           |   17 	12 +	5 -	0 !
  xbmc/windowing/egl/Makefile.in                              |    4 	4 +	0 -	0 !
- 28 files changed, 1957 insertions(+), 75 deletions(-)
+ 29 files changed, 1999 insertions(+), 77 deletions(-)
 
 --- a/configure.ac
 +++ b/configure.ac
@@ -113,7 +116,7 @@
  ### External libraries messages
  
  if test "$host_vendor" = "apple" ; then
-@@ -2329,6 +2367,7 @@ AC_SUBST(HAVE_SSE4)
+@@ -2330,6 +2368,7 @@ AC_SUBST(HAVE_SSE4)
  AC_SUBST(USE_MMAL)
  AC_SUBST(USE_X11)
  AC_SUBST(USE_OPTICAL_DRIVE)
@@ -132,6 +135,49 @@
       AC_SUBST(NATIVE_ARCH_DEFINES, "-DTARGET_POSIX -DTARGET_LINUX -D_LINUX")
       ;;
    *)
+--- a/project/cmake/modules/FindX.cmake
++++ b/project/cmake/modules/FindX.cmake
+@@ -16,7 +16,7 @@
+ #   X::Xext - The X11 extension library
+ 
+ if(PKG_CONFIG_FOUND)
+-  pkg_check_modules(PC_X x11 xext QUIET)
++  pkg_check_modules(PC_X x11 xext xrandr QUIET)
+ endif()
+ 
+ find_path(X_INCLUDE_DIR NAMES X11/Xlib.h
+@@ -25,6 +25,8 @@ find_library(X_LIBRARY NAMES X11
+                        PATHS ${PC_X_x11_LIBDIR})
+ find_library(X_EXT_LIBRARY NAMES Xext
+                            PATHS ${PC_X_xext_LIBDIR})
++find_library(X_RANDR_LIBRARY NAMES Xrandr
++                           PATHS ${PC_X_xrandr_LIBDIR})
+ 
+ set(X_VERSION ${PC_X_x11_VERSION})
+ 
+@@ -34,7 +36,7 @@ find_package_handle_standard_args(X
+                                   VERSION_VAR X_VERSION)
+ 
+ if(X_FOUND)
+-  set(X_LIBRARIES ${X_LIBRARY} ${X_EXT_LIBRARY})
++  set(X_LIBRARIES ${X_LIBRARY} ${X_EXT_LIBRARY} ${X_RANDR_LIBRARY})
+   set(X_INCLUDE_DIRS ${X_INCLUDE_DIR})
+   set(X_DEFINITIONS -DHAVE_X11=1)
+ 
+@@ -52,6 +54,13 @@ if(X_FOUND)
+                                   INTERFACE_INCLUDE_DIRECTORIES "${X_INCLUDE_DIR}"
+                                   INTERFACE_LINK_LIBRARIES X::X)
+   endif()
++  if(NOT TARGET X::Xrandr)
++    add_library(X::Xrandr UNKNOWN IMPORTED)
++    set_target_properties(X::Xrandr PROPERTIES
++                                  IMPORTED_LOCATION "${X_RANDR_LIBRARY}"
++                                  INTERFACE_INCLUDE_DIRECTORIES "${X_INCLUDE_DIR}"
++                                  INTERFACE_LINK_LIBRARIES X::X)
++  endif()
+ endif()
+ 
+ mark_as_advanced(X_INCLUDE_DIR X_LIBRARY X_EXT_LIBRARY)
 --- a/project/cmake/scripts/common/ArchSetup.cmake
 +++ b/project/cmake/scripts/common/ArchSetup.cmake
 @@ -150,6 +150,14 @@ if(NOT DEFINED NEON OR NEON)
@@ -374,7 +420,7 @@
                        OpenMax.cpp
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecMFC.cpp
-@@ -0,0 +1,579 @@
+@@ -0,0 +1,603 @@
 +#include "system.h"
 +
 +#ifndef THIS_IS_NOT_XBMC
@@ -421,6 +467,9 @@
 +  m_Buffer = NULL;
 +  m_BufferNowOnScreen = NULL;
 +
++  m_droppedFrames = 0;
++  m_codecPts = DVD_NOPTS_VALUE;
++
 +  memzero(m_videoBuffer);
 +
 +}
@@ -444,7 +493,7 @@
 +        char sysname[64];
 +        char drivername[32];
 +        char target[1024];
-+        int ret;
++        ssize_t ret;
 +
 +        snprintf(sysname, 64, "/sys/class/video4linux/%s", ent->d_name);
 +        snprintf(name, 64, "/sys/class/video4linux/%s/name", ent->d_name);
@@ -569,8 +618,8 @@
 +  struct V4l2SinkBuffer sinkBuffer;
 +  V4l2Device *finalSink = NULL;
 +  int finalFormat = -1;
-+  int resultVideoWidth;
-+  int resultVideoHeight;
++  unsigned int resultVideoWidth;
++  unsigned int resultVideoHeight;
 +  int resultLineSize;
 +  unsigned int extraSize = 0;
 +  uint8_t *extraData = NULL;
@@ -586,6 +635,8 @@
 +  m_BufferNowOnScreen->iIndex = -1;
 +  m_bVideoConvert = false;
 +  m_bDropPictures = false;
++  m_droppedFrames = 0;
++  m_codecPts = DVD_NOPTS_VALUE;
 +  memzero(m_videoBuffer);
 +
 +  if (!OpenDevices()) {
@@ -662,7 +713,6 @@
 +      break;
 +    default:
 +      return false;
-+      break;
 +  }
 +  fmt.fmt.pix_mp.plane_fmt[0].sizeimage = BUFFER_SIZE;
 +  // Set encoded format
@@ -813,6 +863,11 @@
 +  m_BufferNowOnScreen->iIndex = -1;
 +  m_bCodecHealthy = true;
 +
++  m_processInfo.SetVideoDecoderName(m_name, true);
++  m_processInfo.SetVideoDimensions(resultVideoWidth, resultVideoHeight);
++  m_processInfo.SetVideoDeintMethod("hardware");
++  m_processInfo.SetVideoPixelFormat("YUV 4:2:0");
++
 +  CLog::Log(LOGNOTICE, "%s::%s - MFC Setup succesfull (%dx%d, linesize %d, format 0x%x), start streaming", CLASSNAME, __func__, resultVideoWidth, resultVideoHeight, resultLineSize, finalFormat);
 +
 +  return true;
@@ -840,7 +895,7 @@
 +
 +  if(pData) {
 +    int demuxer_bytes = iSize;
-+    uint8_t *demuxer_content = pData;
++    BYTE *demuxer_content = pData;
 +
 +    if(m_bVideoConvert) {
 +      m_converter.Convert(demuxer_content, demuxer_bytes);
@@ -883,6 +938,9 @@
 +
 +    if (m_bDropPictures) {
 +      CLog::Log(LOGWARNING, "%s::%s - Dropping frame with index %d", CLASSNAME, __func__, m_Buffer->iIndex);
++      long longPts[2] = { m_Buffer->timeStamp.tv_sec, m_Buffer->timeStamp.tv_usec };
++      m_codecPts = *((double*)&longPts[0]);
++      m_droppedFrames++;
 +      // Queue it back to MFC CAPTURE since we are in an underrun condition
 +      m_MFCCapture->PushBuffer(m_Buffer);
 +      return (VC_DROPPED | VC_BUFFER);
@@ -915,7 +973,7 @@
 +  m_videoBuffer.data[0]         = (BYTE*)m_Buffer->cPlane[0];
 +  m_videoBuffer.data[1]         = (BYTE*)m_Buffer->cPlane[1];
 +  m_videoBuffer.data[2]         = (BYTE*)m_Buffer->cPlane[2];
-+  m_videoBuffer.pts             = *((double*)&longPts[0]);
++  m_videoBuffer.pts             = m_codecPts = *((double*)&longPts[0]);
 +
 +  std::swap(m_Buffer, m_BufferNowOnScreen);
 +
@@ -928,7 +986,19 @@
 +
 +}
 +
++bool CDVDVideoCodecMFC::GetCodecStats(double &pts, int &droppedFrames, int &skippedPics) {
++  pts = m_codecPts;
++  droppedFrames = m_droppedFrames;
++  skippedPics = 0;
++  m_droppedFrames = 0;
++
++  return true;
++}
++
 +void CDVDVideoCodecMFC::Reset() {
++
++  m_droppedFrames = 0;
++  m_codecPts = DVD_NOPTS_VALUE;
 +
 +  if (m_bCodecHealthy) {
 +    CLog::Log(LOGDEBUG, "%s::%s - Codec Reset requested, but codec is healthy, doing soft-flush", CLASSNAME, __func__);
@@ -956,7 +1026,7 @@
 +}
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecMFC.h
-@@ -0,0 +1,63 @@
+@@ -0,0 +1,67 @@
 +#pragma once
 +
 +#ifndef THIS_IS_NOT_XBMC
@@ -993,6 +1063,7 @@
 +  virtual bool GetPicture(DVDVideoPicture* pDvdVideoPicture);
 +  virtual void SetDropState(bool bDrop);
 +  virtual const char* GetName() { return m_name.c_str(); }; // m_name is never changed after open
++  virtual bool GetCodecStats(double &pts, int &droppedFrames, int &skippedPics) override;
 +
 +protected:
 +  std::string m_name;
@@ -1017,6 +1088,9 @@
 +  bool m_bDropPictures;
 +
 +  DVDVideoPicture   m_videoBuffer;
++
++  int m_droppedFrames;
++  double m_codecPts;
 +
 +  bool OpenDevices();
 +};
@@ -1709,6 +1783,19 @@
          // win32 has some problems with calculation of load if load close to zero
          curCore.m_fPct = (load < 0) ? 0 : load;
          if (load >= 0 || deltaTotal > 5 * 10 * 1000 * 1000) // do not update (smooth) values for 5 seconds on negative loads
+--- a/xbmc/windowing/X11/GLContextEGL.cpp
++++ b/xbmc/windowing/X11/GLContextEGL.cpp
+@@ -30,6 +30,10 @@
+   #include <GL/glu.h>
+   #include <GL/glext.h>
+ #elif HAS_GLES == 2
++  // always define GL_GLEXT_PROTOTYPES before include gl headers
++  #if !defined(GL_GLEXT_PROTOTYPES)
++    #define GL_GLEXT_PROTOTYPES
++  #endif
+   #include <GLES2/gl2.h>
+   #include <GLES2/gl2ext.h>
+ #endif
 --- a/xbmc/windowing/X11/WinSystemX11.cpp
 +++ b/xbmc/windowing/X11/WinSystemX11.cpp
 @@ -203,7 +203,7 @@ bool CWinSystemX11::SetFullScreen(bool f
@@ -2676,13 +2763,3 @@
  SRCS+= EGLWrapper.cpp
  
  LIB = windowing_egl.a
---- a/project/cmake/CMakeLists.txt
-+++ b/project/cmake/CMakeLists.txt
-@@ -203,6 +203,7 @@ if(NOT WIN32)
-     if(OPENGLES_FOUND)
-       core_optional_dep(X ENABLE_X11)
-       core_optional_dep(LibDRM ENABLE_X11)
-+      core_optional_dep(XRandR ENABLE_X11)
-     endif()
-   endif()
-   if(NOT APPLE)
