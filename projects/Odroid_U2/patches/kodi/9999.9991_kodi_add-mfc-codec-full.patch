@@ -1,36 +1,36 @@
 MFC support for ODROID type hardware.
-
 ---
- configure.ac                                                |   41 	40 +	1 -	0 !
- m4/xbmc_arch.m4                                             |    2 	1 +	1 -	0 !
- project/cmake/modules/FindX.cmake                           |   13 	11 +	2 -	0 !
- project/cmake/scripts/common/ArchSetup.cmake                |    8 	8 +	0 -	0 !
- xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp                 |   39 	26 +	13 -	0 !
- xbmc/cores/VideoPlayer/DVDCodecs/DVDFactoryCodec.cpp        |    5 	5 +	0 -	0 !
- xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp         |   29 	24 +	5 -	0 !
- xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt       |    5 	5 +	0 -	0 !
- xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecMFC.cpp |  603 	603 +	0 -	0 !
- xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecMFC.h   |   67 	67 +	0 -	0 !
- xbmc/cores/VideoPlayer/DVDCodecs/Video/Makefile.in          |    5 	4 +	1 -	0 !
- xbmc/linux/CMakeLists.txt                                   |    2 	2 +	0 -	0 !
- xbmc/linux/LinuxV4l2Sink.cpp                                |  311 	311 +	0 -	0 !
- xbmc/linux/LinuxV4l2Sink.h                                  |   71 	71 +	0 -	0 !
- xbmc/linux/Makefile.in                                      |    1 	1 +	0 -	0 !
- xbmc/system_gl.h                                            |    4 	4 +	0 -	0 !
- xbmc/utils/AMLUtils.cpp                                     |   93 	87 +	6 -	0 !
- xbmc/utils/CPUInfo.cpp                                      |   25 	13 +	12 -	0 !
- xbmc/windowing/X11/GLContextEGL.cpp                         |    4 	4 +	0 -	0 !
- xbmc/windowing/X11/WinSystemX11.cpp                         |    2 	1 +	1 -	0 !
- xbmc/windowing/egl/CMakeLists.txt                           |    6 	4 +	2 -	0 !
- xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp                 |   93 	67 +	26 -	0 !
- xbmc/windowing/egl/EGLNativeTypeAmlogic.h                   |   19 	17 +	2 -	0 !
- xbmc/windowing/egl/EGLNativeTypeFbdev.cpp                   |  183 	183 +	0 -	0 !
- xbmc/windowing/egl/EGLNativeTypeFbdev.h                     |   68 	68 +	0 -	0 !
- xbmc/windowing/egl/EGLNativeTypeHybris.cpp                  |  279 	279 +	0 -	0 !
- xbmc/windowing/egl/EGLNativeTypeHybris.h                    |   77 	77 +	0 -	0 !
- xbmc/windowing/egl/EGLWrapper.cpp                           |   17 	12 +	5 -	0 !
- xbmc/windowing/egl/Makefile.in                              |    4 	4 +	0 -	0 !
- 29 files changed, 1999 insertions(+), 77 deletions(-)
+ configure.ac                                                    |   41 	40 +	1 -	0 !
+ m4/xbmc_arch.m4                                                 |    2 	1 +	1 -	0 !
+ project/cmake/modules/FindX.cmake                               |   13 	11 +	2 -	0 !
+ project/cmake/scripts/common/ArchSetup.cmake                    |    8 	8 +	0 -	0 !
+ xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp                     |   39 	26 +	13 -	0 !
+ xbmc/cores/VideoPlayer/DVDCodecs/DVDFactoryCodec.cpp            |    5 	5 +	0 -	0 !
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp             |   35 	27 +	8 -	0 !
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt           |    5 	5 +	0 -	0 !
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp |    2 	1 +	1 -	0 !
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecMFC.cpp     |  603 	603 +	0 -	0 !
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecMFC.h       |   67 	67 +	0 -	0 !
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/Makefile.in              |    5 	4 +	1 -	0 !
+ xbmc/linux/CMakeLists.txt                                       |    2 	2 +	0 -	0 !
+ xbmc/linux/LinuxV4l2Sink.cpp                                    |  311 	311 +	0 -	0 !
+ xbmc/linux/LinuxV4l2Sink.h                                      |   71 	71 +	0 -	0 !
+ xbmc/linux/Makefile.in                                          |    1 	1 +	0 -	0 !
+ xbmc/system_gl.h                                                |    4 	4 +	0 -	0 !
+ xbmc/utils/AMLUtils.cpp                                         |   93 	87 +	6 -	0 !
+ xbmc/utils/CPUInfo.cpp                                          |   25 	13 +	12 -	0 !
+ xbmc/windowing/X11/GLContextEGL.cpp                             |    4 	4 +	0 -	0 !
+ xbmc/windowing/X11/WinSystemX11.cpp                             |    2 	1 +	1 -	0 !
+ xbmc/windowing/egl/CMakeLists.txt                               |    6 	4 +	2 -	0 !
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp                     |   93 	67 +	26 -	0 !
+ xbmc/windowing/egl/EGLNativeTypeAmlogic.h                       |   19 	17 +	2 -	0 !
+ xbmc/windowing/egl/EGLNativeTypeFbdev.cpp                       |  183 	183 +	0 -	0 !
+ xbmc/windowing/egl/EGLNativeTypeFbdev.h                         |   68 	68 +	0 -	0 !
+ xbmc/windowing/egl/EGLNativeTypeHybris.cpp                      |  279 	279 +	0 -	0 !
+ xbmc/windowing/egl/EGLNativeTypeHybris.h                        |   77 	77 +	0 -	0 !
+ xbmc/windowing/egl/EGLWrapper.cpp                               |   17 	12 +	5 -	0 !
+ xbmc/windowing/egl/Makefile.in                                  |    4 	4 +	0 -	0 !
+ 30 files changed, 2003 insertions(+), 81 deletions(-)
 
 --- a/configure.ac
 +++ b/configure.ac
@@ -333,7 +333,7 @@ MFC support for ODROID type hardware.
        return pCodec;
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
-@@ -427,7 +427,25 @@ void dumpfile_write(am_private_t *para,
+@@ -398,7 +398,25 @@ void dumpfile_write(am_private_t *para,
    }
  
    if (para->dumpdemux && para->dumpfile != -1)
@@ -360,7 +360,16 @@ MFC support for ODROID type hardware.
  }
  
  static vformat_t codecid_to_vformat(enum AVCodecID id)
-@@ -1582,7 +1600,7 @@ bool CAMLCodec::OpenDecoder(CDVDStreamIn
+@@ -713,7 +731,7 @@ int write_av_packet(am_private_t *para,
+         }
+         pkt->newflag = 0;
+     }
+-	
++
+     buf = pkt->data;
+     size = pkt->data_size ;
+     if (size == 0 && pkt->isvalid) {
+@@ -1564,7 +1582,7 @@ bool CAMLCodec::OpenDecoder(CDVDStreamIn
        // h264 in an avi file
        if (m_hints.ptsinvalid)
          am_private->gcodec.param = (void*)(EXTERNAL_PTS | SYNC_OUTSIDE);
@@ -369,16 +378,28 @@ MFC support for ODROID type hardware.
      case VFORMAT_REAL:
        am_private->stream_type = AM_STREAM_RM;
        am_private->vcodec.noblock = 1;
-@@ -1646,7 +1664,7 @@ bool CAMLCodec::OpenDecoder(CDVDStreamIn
-   am_private->am_pkt.codec = &am_private->vcodec;
-   pre_header_feeding(am_private, &am_private->am_pkt);
+@@ -1629,7 +1647,7 @@ bool CAMLCodec::OpenDecoder(CDVDStreamIn
+ 
+   Create();
  
 -  m_display_rect = CRect(0, 0, CDisplaySettings::GetInstance().GetCurrentResolutionInfo().iWidth, CDisplaySettings::GetInstance().GetCurrentResolutionInfo().iHeight);
 +  m_display_rect = CRect(0, 0, CDisplaySettings::GetInstance().GetCurrentResolutionInfo().iScreenWidth, CDisplaySettings::GetInstance().GetCurrentResolutionInfo().iScreenHeight);
  
    std::string strScaler;
    SysfsUtils::GetString("/sys/class/ppmgr/ppscaler", strScaler);
-@@ -2200,7 +2218,6 @@ void CAMLCodec::SetVideoRect(const CRect
+@@ -1852,9 +1870,9 @@ int CAMLCodec::Decode(uint8_t *pData, si
+ 
+   // if we have still frames, demux size will be small
+   // and we need to pre-buffer more.
+-  double target_timesize = 1.0;
++  double target_timesize = 1.5;
+   if (iSize < 20)
+-    target_timesize = 2.0;
++    target_timesize += 1.0;
+ 
+   int rtn = 0;
+ 
+@@ -2155,7 +2173,6 @@ void CAMLCodec::SetVideoRect(const CRect
          int diff = (int) ((dst_rect.Height() - dst_rect.Width()) / 2);
          dst_rect = CRect(DestRect.x1 - diff, DestRect.y1, DestRect.x2 + diff, DestRect.y2);
        }
@@ -386,7 +407,7 @@ MFC support for ODROID type hardware.
    }
  
    if (m_dst_rect != dst_rect)
-@@ -2222,7 +2239,7 @@ void CAMLCodec::SetVideoRect(const CRect
+@@ -2177,7 +2194,7 @@ void CAMLCodec::SetVideoRect(const CRect
  #ifdef TARGET_ANDROID
    display = m_display_rect;
  #else
@@ -395,7 +416,7 @@ MFC support for ODROID type hardware.
  #endif
    if (gui != display)
    {
-@@ -2294,6 +2311,8 @@ void CAMLCodec::SetVideoRect(const CRect
+@@ -2249,6 +2266,8 @@ void CAMLCodec::SetVideoRect(const CRect
    std::string s_gui = StringUtils::Format("%i,%i,%i,%i",
      (int)gui.x1, (int)gui.y1,
      (int)gui.Width(), (int)gui.Height());
@@ -418,6 +439,17 @@ MFC support for ODROID type hardware.
  if(OPENMAX_FOUND)
    list(APPEND SOURCES DVDVideoCodecOpenMax.cpp
                        OpenMax.cpp
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
+@@ -123,7 +123,7 @@ bool CDVDVideoCodecAmlogic::Open(CDVDStr
+       // under streamers can have issues when seeking.
+       if (m_hints.extradata && *(uint8_t*)m_hints.extradata == 1)
+       {
+-        m_bitstream = new CBitstreamConverter;
++        m_bitstream = new CBitstreamConverter();
+         m_bitstream->Open(m_hints.codec, (uint8_t*)m_hints.extradata, m_hints.extrasize, true);
+         // make sure we do not leak the existing m_hints.extradata
+         free(m_hints.extradata);
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecMFC.cpp
 @@ -0,0 +1,603 @@
