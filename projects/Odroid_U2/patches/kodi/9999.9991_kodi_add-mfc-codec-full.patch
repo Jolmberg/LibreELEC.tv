@@ -213,7 +213,7 @@ MFC support for ODROID type hardware.
  }
  
  bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
-@@ -743,16 +745,16 @@ bool CAESinkALSA::InitializeHW(const ALS
+@@ -748,16 +750,16 @@ bool CAESinkALSA::InitializeHW(const ALS
    snd_pcm_hw_params_get_buffer_size_max(hw_params, &bufferSize);
    snd_pcm_hw_params_get_period_size_max(hw_params, &periodSize, NULL);
  
@@ -234,7 +234,7 @@ MFC support for ODROID type hardware.
     According to upstream we should set buffer size first - so make sure it is always at least
     4x period size to not get underruns (some systems seem to have issues with only 2 periods)
    */
-@@ -771,7 +773,7 @@ bool CAESinkALSA::InitializeHW(const ALS
+@@ -776,7 +778,7 @@ bool CAESinkALSA::InitializeHW(const ALS
      snd_pcm_hw_params_copy(hw_params_copy, hw_params); // restore working copy
      CLog::Log(LOGDEBUG, "CAESinkALSA::InitializeHW - Request: Failed to limit periodSize to %lu", periodSizeMax);
    }
@@ -243,7 +243,7 @@ MFC support for ODROID type hardware.
    // first trying bufferSize, PeriodSize
    // for more info see here:
    // http://mailman.alsa-project.org/pipermail/alsa-devel/2009-September/021069.html
-@@ -781,22 +783,24 @@ bool CAESinkALSA::InitializeHW(const ALS
+@@ -786,22 +788,24 @@ bool CAESinkALSA::InitializeHW(const ALS
    snd_pcm_uframes_t periodSizeTemp, bufferSizeTemp;
    periodSizeTemp = periodSize;
    bufferSizeTemp = bufferSize;
@@ -272,7 +272,7 @@ MFC support for ODROID type hardware.
          || snd_pcm_hw_params(m_pcm, hw_params_copy) != 0)
        {
          // try only BufferSize
-@@ -818,7 +822,7 @@ bool CAESinkALSA::InitializeHW(const ALS
+@@ -823,7 +827,7 @@ bool CAESinkALSA::InitializeHW(const ALS
        snd_pcm_get_params(m_pcm, &bufferSize, &periodSize);
      }
    }
@@ -281,7 +281,7 @@ MFC support for ODROID type hardware.
    CLog::Log(LOGDEBUG, "CAESinkALSA::InitializeHW - Got: periodSize %lu, bufferSize %lu", periodSize, bufferSize);
  
    /* set the format parameters */
-@@ -1300,6 +1304,15 @@ void CAESinkALSA::EnumerateDevicesEx(AED
+@@ -1305,6 +1309,15 @@ void CAESinkALSA::EnumerateDevicesEx(AED
  
  AEDeviceType CAESinkALSA::AEDeviceTypeFromName(const std::string &name)
  {
@@ -297,7 +297,7 @@ MFC support for ODROID type hardware.
    if (name.substr(0, 4) == "hdmi")
      return AE_DEVTYPE_HDMI;
    else if (name.substr(0, 6) == "iec958" || name.substr(0, 5) == "spdif")
-@@ -1404,9 +1417,9 @@ void CAESinkALSA::EnumerateDevice(AEDevi
+@@ -1409,9 +1422,9 @@ void CAESinkALSA::EnumerateDevice(AEDevi
  
              if (badHDMI)
              {
@@ -399,7 +399,7 @@ MFC support for ODROID type hardware.
  
    int rtn = 0;
  
-@@ -2155,7 +2173,6 @@ void CAMLCodec::SetVideoRect(const CRect
+@@ -2165,7 +2183,6 @@ void CAMLCodec::SetVideoRect(const CRect
          int diff = (int) ((dst_rect.Height() - dst_rect.Width()) / 2);
          dst_rect = CRect(DestRect.x1 - diff, DestRect.y1, DestRect.x2 + diff, DestRect.y2);
        }
@@ -407,7 +407,7 @@ MFC support for ODROID type hardware.
    }
  
    if (m_dst_rect != dst_rect)
-@@ -2177,7 +2194,7 @@ void CAMLCodec::SetVideoRect(const CRect
+@@ -2187,7 +2204,7 @@ void CAMLCodec::SetVideoRect(const CRect
  #ifdef TARGET_ANDROID
    display = m_display_rect;
  #else
@@ -416,7 +416,7 @@ MFC support for ODROID type hardware.
  #endif
    if (gui != display)
    {
-@@ -2249,6 +2266,8 @@ void CAMLCodec::SetVideoRect(const CRect
+@@ -2287,6 +2304,8 @@ void CAMLCodec::SetVideoRect(const CRect
    std::string s_gui = StringUtils::Format("%i,%i,%i,%i",
      (int)gui.x1, (int)gui.y1,
      (int)gui.Width(), (int)gui.Height());
@@ -1600,7 +1600,7 @@ MFC support for ODROID type hardware.
      valstr[strlen(valstr)] = '\0';
      close(fd);
  
-@@ -390,6 +391,60 @@ bool aml_mode_to_resolution(const char *
+@@ -435,6 +436,60 @@ bool aml_mode_to_resolution(const char *
      res->fRefreshRate = 50;
      res->dwFlags = D3DPRESENTFLAG_PROGRESSIVE;
    }
@@ -1661,7 +1661,7 @@ MFC support for ODROID type hardware.
    else if (StringUtils::EqualsNoCase(fromMode, "720p") || StringUtils::EqualsNoCase(fromMode, "720p60hz"))
    {
      res->iWidth = 1280;
-@@ -435,6 +490,24 @@ bool aml_mode_to_resolution(const char *
+@@ -480,6 +535,24 @@ bool aml_mode_to_resolution(const char *
      res->fRefreshRate = 24;
      res->dwFlags = D3DPRESENTFLAG_PROGRESSIVE;
    }
@@ -1686,7 +1686,7 @@ MFC support for ODROID type hardware.
    else if (StringUtils::EqualsNoCase(fromMode, "1080p30hz"))
    {
      res->iWidth = 1920;
-@@ -543,7 +616,7 @@ bool aml_mode_to_resolution(const char *
+@@ -588,7 +661,7 @@ bool aml_mode_to_resolution(const char *
      res->fRefreshRate = 30;
      res->dwFlags = D3DPRESENTFLAG_PROGRESSIVE;
    }
@@ -1695,7 +1695,7 @@ MFC support for ODROID type hardware.
    {
      res->iWidth = 1920;
      res->iHeight= 1080;
-@@ -552,7 +625,16 @@ bool aml_mode_to_resolution(const char *
+@@ -597,7 +670,16 @@ bool aml_mode_to_resolution(const char *
      res->fRefreshRate = 50;
      res->dwFlags = D3DPRESENTFLAG_PROGRESSIVE;
    }
@@ -1713,7 +1713,7 @@ MFC support for ODROID type hardware.
    {
      res->iWidth = 1920;
      res->iHeight= 1080;
-@@ -577,4 +659,3 @@ bool aml_mode_to_resolution(const char *
+@@ -622,4 +704,3 @@ bool aml_mode_to_resolution(const char *
  
    return res->iWidth > 0 && res->iHeight> 0;
  }
@@ -1857,7 +1857,7 @@ MFC support for ODROID type hardware.
  if(OPENGLES_FOUND)
 --- a/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
 +++ b/xbmc/windowing/egl/EGLNativeTypeAmlogic.cpp
-@@ -23,13 +23,18 @@
+@@ -24,13 +24,18 @@
  #include "utils/AMLUtils.h"
  #include "utils/StringUtils.h"
  #include "utils/SysfsUtils.h"
@@ -1877,7 +1877,7 @@ MFC support for ODROID type hardware.
  CEGLNativeTypeAmlogic::CEGLNativeTypeAmlogic()
  {
    const char *env_framebuffer = getenv("FRAMEBUFFER");
-@@ -63,28 +68,37 @@ bool CEGLNativeTypeAmlogic::CheckCompati
+@@ -64,28 +69,37 @@ bool CEGLNativeTypeAmlogic::CheckCompati
  void CEGLNativeTypeAmlogic::Initialize()
  {
    aml_permissions();
@@ -1918,7 +1918,7 @@ MFC support for ODROID type hardware.
    m_nativeWindow = nativeWindow;
  
    SetFramebufferResolution(nativeWindow->width, nativeWindow->height);
-@@ -97,6 +111,8 @@ bool CEGLNativeTypeAmlogic::CreateNative
+@@ -98,6 +112,8 @@ bool CEGLNativeTypeAmlogic::CreateNative
  
  bool CEGLNativeTypeAmlogic::GetNativeDisplay(XBNativeDisplayType **nativeDisplay) const
  {
@@ -1927,7 +1927,7 @@ MFC support for ODROID type hardware.
    if (!nativeDisplay)
      return false;
    *nativeDisplay = (XBNativeDisplayType*) &m_nativeDisplay;
-@@ -105,6 +121,8 @@ bool CEGLNativeTypeAmlogic::GetNativeDis
+@@ -106,6 +122,8 @@ bool CEGLNativeTypeAmlogic::GetNativeDis
  
  bool CEGLNativeTypeAmlogic::GetNativeWindow(XBNativeWindowType **nativeWindow) const
  {
@@ -1936,7 +1936,7 @@ MFC support for ODROID type hardware.
    if (!nativeWindow)
      return false;
    *nativeWindow = (XBNativeWindowType*) &m_nativeWindow;
-@@ -113,11 +131,15 @@ bool CEGLNativeTypeAmlogic::GetNativeWin
+@@ -114,11 +132,15 @@ bool CEGLNativeTypeAmlogic::GetNativeWin
  
  bool CEGLNativeTypeAmlogic::DestroyNativeDisplay()
  {
@@ -1952,16 +1952,17 @@ MFC support for ODROID type hardware.
  #if defined(_FBDEV_WINDOW_H_)
    delete (fbdev_window*)m_nativeWindow, m_nativeWindow = NULL;
  #endif
-@@ -133,6 +155,8 @@ bool CEGLNativeTypeAmlogic::GetNativeRes
+@@ -134,7 +156,9 @@ bool CEGLNativeTypeAmlogic::GetNativeRes
  
  bool CEGLNativeTypeAmlogic::SetNativeResolution(const RESOLUTION_INFO &res)
  {
 +  CLog::Log(LOGNOTICE, "%s::%s to %dx%d@%f", CLASSNAME, __func__, res.iScreenWidth, res.iScreenHeight, res.fRefreshRate);
+   bool result = false;
 +
  #if defined(_FBDEV_WINDOW_H_)
    if (m_nativeWindow)
    {
-@@ -152,6 +176,8 @@ bool CEGLNativeTypeAmlogic::SetNativeRes
+@@ -158,6 +182,8 @@ bool CEGLNativeTypeAmlogic::SetNativeRes
  
  bool CEGLNativeTypeAmlogic::ProbeResolutions(std::vector<RESOLUTION_INFO> &resolutions)
  {
@@ -1970,7 +1971,7 @@ MFC support for ODROID type hardware.
    std::string valstr;
    SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/disp_cap", valstr);
    std::vector<std::string> probe_str = StringUtils::Split(valstr, "\n");
-@@ -164,11 +190,12 @@ bool CEGLNativeTypeAmlogic::ProbeResolut
+@@ -170,11 +196,12 @@ bool CEGLNativeTypeAmlogic::ProbeResolut
        resolutions.push_back(res);
    }
    return resolutions.size() > 0;
@@ -1984,7 +1985,7 @@ MFC support for ODROID type hardware.
    // check display/mode, it gets defaulted at boot
    if (!GetNativeResolution(res))
    {
-@@ -181,6 +208,8 @@ bool CEGLNativeTypeAmlogic::GetPreferred
+@@ -187,6 +214,8 @@ bool CEGLNativeTypeAmlogic::GetPreferred
  
  bool CEGLNativeTypeAmlogic::ShowWindow(bool show)
  {
@@ -1993,7 +1994,7 @@ MFC support for ODROID type hardware.
    std::string blank_framebuffer = "/sys/class/graphics/" + m_framebuffer_name + "/blank";
    SysfsUtils::SetInt(blank_framebuffer.c_str(), show ? 0 : 1);
    return true;
-@@ -188,6 +217,8 @@ bool CEGLNativeTypeAmlogic::ShowWindow(b
+@@ -194,6 +223,8 @@ bool CEGLNativeTypeAmlogic::ShowWindow(b
  
  bool CEGLNativeTypeAmlogic::SetDisplayResolution(const char *resolution)
  {
@@ -2002,7 +2003,7 @@ MFC support for ODROID type hardware.
    std::string mode = resolution;
    // switch display resolution
    SysfsUtils::SetString("/sys/class/display/mode", mode.c_str());
-@@ -195,36 +226,46 @@ bool CEGLNativeTypeAmlogic::SetDisplayRe
+@@ -201,36 +232,46 @@ bool CEGLNativeTypeAmlogic::SetDisplayRe
    RESOLUTION_INFO res;
    aml_mode_to_resolution(mode.c_str(), &res);
    SetFramebufferResolution(res);
@@ -2068,7 +2069,7 @@ MFC support for ODROID type hardware.
  }
  
  void CEGLNativeTypeAmlogic::SetFramebufferResolution(const RESOLUTION_INFO &res) const
-@@ -244,8 +285,8 @@ void CEGLNativeTypeAmlogic::SetFramebuff
+@@ -250,8 +291,8 @@ void CEGLNativeTypeAmlogic::SetFramebuff
      {
        vinfo.xres = width;
        vinfo.yres = height;
