@@ -62,7 +62,7 @@ case "$LINUX" in
     PKG_VERSION="4.9.43"
     PKG_URL="http://www.kernel.org/pub/linux/kernel/v4.x/$PKG_NAME-$PKG_VERSION.tar.xz"
     PKG_PATCH_DIRS="default-rpi"
-    ;;  
+    ;;
   mfc-3.8)
     PKG_COMMIT="ddfddf8"
     PKG_VERSION="${PKG_COMMIT}"

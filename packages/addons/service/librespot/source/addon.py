@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of LibreELEC - https://libreelec.tv
-#      Copyright (C) 2016 Team LibreELEC
+#      Copyright (C) 2017-present Team LibreELEC
 #
 #  LibreELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,26 +16,24 @@
 #  along with LibreELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="dtc"
-PKG_VERSION="1.4.4"
-PKG_ARCH="any"
-PKG_LICENSE="GPL"
-PKG_SITE="https://git.kernel.org/pub/scm/utils/dtc/dtc.git/"
-PKG_URL="https://git.kernel.org/pub/scm/utils/dtc/dtc.git/snapshot/$PKG_VERSION.tar.gz"
-PKG_SOURCE_DIR="$PKG_VERSION"
-PKG_DEPENDS_TARGET="toolchain"
-PKG_SECTION="tools"
-PKG_SHORTDESC="The Device Tree Compiler"
-PKG_LONGDESC="The Device Tree Compiler"
-PKG_AUTORECONF="no"
+import alsaaudio as alsa
+import xbmcaddon
+import xbmcgui
 
-PKG_MAKE_OPTS_TARGET="dtc"
 
-makeinstall_target() {
-  mkdir -p $INSTALL/usr/bin
-    cp -P $PKG_BUILD/dtc $INSTALL/usr/bin
-}
+dialog  = xbmcgui.Dialog()
+strings  = xbmcaddon.Addon().getLocalizedString
+while True:
+   pcms = alsa.pcms()[1:]
+   if len(pcms) == 0:
+      dialog.ok(xbmcaddon.Addon().getAddonInfo('name'), strings(30210))
+      break
+   pcmx = dialog.select(strings(30112), pcms)
+   if pcmx == -1:
+      break
+   pcm = pcms[pcmx]
+   xbmcaddon.Addon().setSetting('ls_o', pcm)
+   break
+del dialog
 
-makeinstall_host() {
-  make install PREFIX=$TOOLCHAIN
-}
+

@@ -76,4 +76,3 @@ Cflags: -I${includedir}/EGL
     ln -sf libMali.so $INSTALL/usr/lib/libEGL.so
     ln -sf libMali.so $INSTALL/usr/lib/libGLESv2.so
 }
-
