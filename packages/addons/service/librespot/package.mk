@@ -36,7 +36,7 @@ PKG_ADDON_TYPE="xbmc.service.library"
 PKG_MAINTAINER="Anton Voyl (awiouy)"
 
 configure_target() {
-  . "$ROOT/$TOOLCHAIN/.cargo/env"
+  . "$TOOLCHAIN/.cargo/env"
   export PKG_CONFIG_ALLOW_CROSS=0
   strip_lto
 }
@@ -44,7 +44,7 @@ configure_target() {
 make_target() {
   cd src
   $CARGO_BUILD --no-default-features --features "alsa-backend pulseaudio-backend with-avahi"
-  cd "$ROOT/$PKG_BUILD/.$TARGET_NAME"/*/release
+  cd "$PKG_BUILD/.$TARGET_NAME"/*/release
   $STRIP librespot
 }
 

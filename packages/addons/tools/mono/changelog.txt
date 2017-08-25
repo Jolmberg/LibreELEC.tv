@@ -19,4 +19,4 @@
 - Remove uneeded binaries and libraries
 
 100
-- Initial release
+- Initial add-on
