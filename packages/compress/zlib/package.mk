@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="zlib"
-PKG_VERSION="1.2.8"
+PKG_VERSION="1.2.11"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.zlib.net"
@@ -52,4 +52,3 @@ post_makeinstall_target() {
  # Install minizip
  make -C $PKG_BUILD/contrib/minizip DESTDIR=$SYSROOT_PREFIX install
 }
-

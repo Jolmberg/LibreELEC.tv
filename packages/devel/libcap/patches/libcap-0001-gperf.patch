@@ -1,0 +1,30 @@
+---
+ libcap/Makefile |    5 	3 +	2 -	0 !
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+--- a/libcap/Makefile
++++ b/libcap/Makefile
+@@ -24,7 +24,7 @@ all: $(MINLIBNAME) $(STALIBNAME) libcap.
+ 
+ ifeq ($(BUILD_GPERF),yes)
+ USE_GPERF_OUTPUT = $(GPERF_OUTPUT)
+-INCLUDE_GPERF_OUTPUT = -include $(GPERF_OUTPUT)
++INCLUDE_GPERF_OUTPUT = -include stddef.h -include $(GPERF_OUTPUT)
+ endif
+ 
+ libcap.pc: libcap.pc.in
+@@ -43,12 +43,13 @@ cap_names.h: _makenames
+ 	./_makenames > cap_names.h
+ 
+ $(GPERF_OUTPUT): cap_names.list.h
+-	(printf "%b" "struct __cap_token_s { const char *name; int index; };\n%{\nconst struct __cap_token_s *__cap_lookup_name(const char *, unsigned int);\n%}\n%%\n"; \
++	(printf "%b" "struct __cap_token_s { const char *name; int index; };\n%{\nconst struct __cap_token_s *__cap_lookup_name(const char *, register size_t);\n%}\n%%\n"; \
+ 	$(SED) -e 's:["{}]::g' -e 's:,$$::' $<) | \
+ 	gperf \
+ 		--ignore-case \
+ 		--language=ANSI-C \
+ 		--readonly \
++		--includes \
+ 		--null-strings \
+ 		--global-table \
+ 		--hash-function-name=__cap_hash_name \

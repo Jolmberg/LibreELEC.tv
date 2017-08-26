@@ -35,13 +35,14 @@ PKG_AUTORECONF="no"
 post_unpack() {
   mkdir -p $PKG_BUILD/.$HOST_NAME
   cp -r $PKG_BUILD/* $PKG_BUILD/.$HOST_NAME
-  mkdir -p $PKG_BUILD/.$TARGET_NAME 
+  mkdir -p $PKG_BUILD/.$TARGET_NAME
   cp -r $PKG_BUILD/* $PKG_BUILD/.$TARGET_NAME
 }
 
 
 make_host() {
   cd $PKG_BUILD/.$HOST_NAME
+  $SED 's@^BUILD_GPERF@#\0@' -i Make.Rules
   make CC=$CC \
        AR=$AR \
        RANLIB=$RANLIB \
@@ -54,6 +55,7 @@ make_host() {
 
 make_target() {
   cd $PKG_BUILD/.$TARGET_NAME
+  $SED 's@^BUILD_GPERF@#\0@' -i Make.Rules
   make CC=$CC \
        AR=$AR \
        RANLIB=$RANLIB \
