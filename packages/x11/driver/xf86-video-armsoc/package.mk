@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="xf86-video-armsoc"
-PKG_VERSION="3.1.0-rc1"
+PKG_VERSION="3.2.4"
 PKG_REV="1"
 PKG_ARCH="arm"
 PKG_LICENSE="OSS"
