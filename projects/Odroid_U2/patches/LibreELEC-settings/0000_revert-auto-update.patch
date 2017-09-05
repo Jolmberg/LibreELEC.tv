@@ -1,0 +1,27 @@
+---
+ src/resources/lib/modules/system.py |    5 	3 +	2 -	0 !
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+--- a/src/resources/lib/modules/system.py
++++ b/src/resources/lib/modules/system.py
+@@ -139,10 +139,10 @@ class system:
+                     'settings': {
+                         'AutoUpdate': {
+                             'name': 32014,
+-                            'value': 'auto',
++                            'value': 'manual',
+                             'action': 'set_auto_update',
+                             'type': 'multivalue',
+-                            'values': ['auto', 'manual'],
++                            'values': ['manual', 'auto'],
+                             'InfoText': 714,
+                             'order': 1,
+                             },
+@@ -219,6 +219,7 @@ class system:
+                             'name': 32020,
+                             'value': '',
+                             'action': 'do_manual_update',
++
+                             'type': 'multivalue',
+                             'parent': {
+                                 'entry': 'AutoUpdate',
