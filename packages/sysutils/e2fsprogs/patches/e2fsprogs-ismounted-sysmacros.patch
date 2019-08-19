@@ -1,0 +1,11 @@
+diff -up e2fsprogs-1.43.4/lib/ext2fs/ismounted.c~ e2fsprogs-1.43.4/lib/ext2fs/ismounted.c
+--- e2fsprogs-1.43.4/lib/ext2fs/ismounted.c~	2019-08-18 22:21:51.818349186 +0200
++++ e2fsprogs-1.43.4/lib/ext2fs/ismounted.c	2019-08-18 22:22:06.506310948 +0200
+@@ -46,6 +46,7 @@
+ #endif /* HAVE_GETMNTINFO */
+ #include <string.h>
+ #include <sys/stat.h>
++#include <sys/sysmacros.h>
+ #if HAVE_SYS_TYPES_H
+ #include <sys/types.h>
+ #endif

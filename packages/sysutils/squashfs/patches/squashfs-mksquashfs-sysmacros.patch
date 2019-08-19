@@ -1,0 +1,11 @@
+diff -up squashfs-4.3/squashfs-tools/mksquashfs.c~ squashfs-4.3/squashfs-tools/mksquashfs.c
+--- squashfs-4.3/squashfs-tools/mksquashfs.c~	2019-08-18 22:04:42.648977510 +0200
++++ squashfs-4.3/squashfs-tools/mksquashfs.c	2019-08-18 22:05:27.124866411 +0200
+@@ -44,6 +44,7 @@
+ #include <setjmp.h>
+ #include <sys/types.h>
+ #include <sys/mman.h>
++#include <sys/sysmacros.h>
+ #include <pthread.h>
+ #include <regex.h>
+ #include <fnmatch.h>
